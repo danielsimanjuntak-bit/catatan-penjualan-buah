@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pencatatan Penjualan Toko Buah</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    h2 {
+      text-align: center;
+      color: #16a34a;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .row .form-group {
+      flex: 1;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #15803d;
+    }
+    button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    .status-msg {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+      text-align: center;
+      font-weight: bold;
+    }
+    .success { background-color: #dcfce7; color: #166534; }
+    .error { background-color: #fee2e2; color: #991b1b; }
+    
+    /* Highlight untuk Total Harga */
+    .total-field {
+      background-color: #f0fdf4;
+      font-weight: bold;
+      color: #15803d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🍎 Catatan Penjualan Toko Buah Segar</h2>
+    
+    <div id="statusMessage" class="status-msg"></div>
+
+    <form id="orderForm">
+      <div class="form-group">
+        <label for="nama">Nama Pemesan</label>
+        <input type="text" id="nama" name="nama" placeholder="Contoh: Ibu Rina" required>
+      </div>
+
+      <div class="form-group">
+        <label for="buah">Pilih Jenis Buah</label>
+        <select id="buah" name="buah" required>
+          <option value="">-- Pilih Buah --</option>
+          <option value="Jeruk">Jeruk</option>
+          <option value="Salak">Salak</option>
+          <option value="Mangga">Mangga</option>
+          <option value="Duku">Duku</option>
+          <option value="Apel">Apel</option>
+          <option value="Pir">Pir</option>
+          <option value="Alpukat">Alpukat</option>
+          <option value="Anggur">Anggur</option>
+          <option value="Durian">Durian</option>
+          <option value="Manggis">Manggis</option>
+          <option value="Melon">Melon</option>
+          <option value="Pisang">Pisang</option>
+          <option value="Semangka">Semangka</option>
+          <option value="Lainnya">Buah Lainnya...</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="jumlah">Jumlah / Qty</label>
+          <input type="number" id="jumlah" name="jumlah" placeholder="Contoh: 3" min="1" required>
+        </div>
+        <div class="form-group">
+          <label for="satuan">Satuan</label>
+          <select id="satuan" name="satuan">
+            <option value="Kg">Kg</option>
+            <option value="Gram">Gram</option>
+            <option value="Pcs/Buah">Pcs / Buah</option>
+            <option value="Dus/Karton">Dus / Karton</option>
+            <option value="Paket Hampers">Paket Hampers</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label for="harga">Harga Satuan (Rp)</label>
+          <input type="number" id="harga" name="harga" placeholder="Contoh: 30000" required>
+        </div>
+        <div class="form-group">
+          <label for="total">Total Harga (Rp)</label>
+          <!-- Input ini dihitung otomatis oleh JavaScript -->
+          <input type="text" id="total" class="total-field" placeholder="Rp 0" readonly>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status Pembayaran</label>
+        <select id="status" name="status">
+          <option value="Lunas">Lunas</option>
+          <option value="Belum Bayar">Belum Bayar</option>
+        </select>
+      </div>
+
+      <button type="submit" id="btnSubmit">Simpan Ke Google Sheets</button>
+    </form>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCu0qbSOr3_nKKubiMXf6lNsnZ-jqKei18cxgewpjIqToPoFIN1WqBuF4XJFcIA5Dt/exec";
+
+    const form = document.getElementById('orderForm');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const statusMsg = document.getElementById('statusMessage');
+    
+    const inputJumlah = document.getElementById('jumlah');
+    const inputHarga = document.getElementById('harga');
+    const inputTotal = document.getElementById('total');
+
+    // Fungsi Hitung Otomatis Total Harga
+    function hitungTotal() {
+      const jumlah = parseFloat(inputJumlah.value) || 0;
+      const harga = parseFloat(inputHarga.value) || 0;
+      const total = jumlah * harga;
+      
+      inputTotal.value = total > 0 ? "Rp " + total.toLocaleString('id-ID') : "Rp 0";
+    }
+
+    inputJumlah.addEventListener('input', hitungTotal);
+    inputHarga.addEventListener('input', hitungTotal);
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = "Mengirim Data...";
+
+      const formData = new FormData(form);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: formData
+      })
+      .then(() => {
+        statusMsg.className = "status-msg success";
+        statusMsg.innerText = "✅ Pesanan Berhasil Disimpan ke Google Sheets!";
+        statusMsg.style.display = "block";
+        form.reset();
+        inputTotal.value = "Rp 0";
+      })
+      .catch(error => {
+        statusMsg.className = "status-msg error";
+        statusMsg.innerText = "❌ Gagal Menyimpan Data. Coba Lagi.";
+        statusMsg.style.display = "block";
+        console.error('Error!', error.message);
+      })
+      .finally(() => {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = "Simpan Ke Google Sheets";
+        setTimeout(() => { statusMsg.style.display = "none"; }, 4000);
+      });
+    });
+  </script>
+
+</body>
+</html>
