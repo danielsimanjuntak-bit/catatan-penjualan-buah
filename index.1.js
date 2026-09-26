@@ -1,25 +1,25 @@
-// State data penyimpanan sementara
+// Gantilah baris pertama ini dengan URL yang disalin
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCu0qbSOr3_nKKubiMXf6lNsnZ-jqKei18cxgewpjIqToPoFIN1WqBuF4XJFcIA5Dt/exec';
+
 let daftarPenjualan = [];
 let filterStatus = 'semua';
 
-// Jalankan fungsi awal saat halaman selesai dimuat
 document.addEventListener('DOMContentLoaded', () => {
-  // Set default input tanggal ke hari ini (YYYY-MM-DD)
+  // Set default tanggal hari ini (YYYY-MM-DD)
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('tanggalPenjualan').value = today;
 
-  // Event Listener Otomatis Hitung Total Harga
+  // Event Listener Hitung Total
   document.getElementById('qty').addEventListener('input', hitungTotal);
   document.getElementById('hargaSatuan').addEventListener('input', hitungTotal);
 
-  // Event Listener Submit Form
+  // Event Listener Submit
   document.getElementById('formPenjualan').addEventListener('submit', simpanPenjualan);
 
   renderTabelPenjualan();
   updateDashboard();
 });
 
-// Fungsi menghitung Total Harga secara otomatis
 function hitungTotal() {
   const qty = parseFloat(document.getElementById('qty').value) || 0;
   const harga = parseFloat(document.getElementById('hargaSatuan').value) || 0;
@@ -27,53 +27,64 @@ function hitungTotal() {
   document.getElementById('totalHarga').value = `Rp ${total.toLocaleString('id-ID')}`;
 }
 
-// Fungsi menyimpan data penjualan baru
-function simpanPenjualan(e) {
+async function simpanPenjualan(e) {
   e.preventDefault();
 
-  const tanggal = document.getElementById('tanggalPenjualan').value;
-  const namaPelanggan = document.getElementById('namaPelanggan').value;
-  const noWa = document.getElementById('noWa').value;
-  const pilihBuah = document.getElementById('pilihBuah').value;
-  const qty = parseFloat(document.getElementById('qty').value);
-  const satuan = document.getElementById('satuan').value;
-  const hargaSatuan = parseFloat(document.getElementById('hargaSatuan').value);
-  const totalHarga = qty * hargaSatuan;
-  const statusPembayaran = document.getElementById('statusPembayaran').value;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerText;
+  
+  submitBtn.innerText = 'Menyimpan ke Google Sheets...';
+  submitBtn.disabled = true;
 
-  const transaksiBaru = {
-    id: Date.now(),
-    tanggal: tanggal,
-    pelanggan: namaPelanggan,
-    noWa: noWa,
-    buah: pilihBuah,
-    qty: qty,
-    satuan: satuan,
-    hargaSatuan: hargaSatuan,
-    totalHarga: totalHarga,
-    status: statusPembayaran
+  const dataTransaksi = {
+    tipe: 'penjualan',
+    tanggal: document.getElementById('tanggalPenjualan').value,
+    pelanggan: document.getElementById('namaPelanggan').value,
+    noWa: document.getElementById('noWa').value,
+    buah: document.getElementById('pilihBuah').value,
+    qty: parseFloat(document.getElementById('qty').value),
+    satuan: document.getElementById('satuan').value,
+    hargaSatuan: parseFloat(document.getElementById('hargaSatuan').value),
+    totalHarga: parseFloat(document.getElementById('qty').value) * parseFloat(document.getElementById('hargaSatuan').value),
+    status: document.getElementById('statusPembayaran').value
   };
 
-  daftarPenjualan.unshift(transaksiBaru);
+  try {
+    // Kirim data ke Google Sheets
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dataTransaksi)
+    });
 
-  // Reset form
-  document.getElementById('formPenjualan').reset();
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('tanggalPenjualan').value = today;
-  document.getElementById('totalHarga').value = 'Rp 0';
+    // Simpan ke tampilan lokal
+    daftarPenjualan.unshift({ id: Date.now(), ...dataTransaksi });
 
-  renderTabelPenjualan();
-  updateDashboard();
+    // Reset Form
+    document.getElementById('formPenjualan').reset();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tanggalPenjualan').value = today;
+    document.getElementById('totalHarga').value = 'Rp 0';
+
+    renderTabelPenjualan();
+    updateDashboard();
+    alert('Data berhasil disimpan ke Google Sheets!');
+  } catch (error) {
+    console.error('Gagal menyimpan data:', error);
+    alert('Gagal terhubung ke Google Sheets.');
+  } finally {
+    submitBtn.innerText = originalBtnText;
+    submitBtn.disabled = false;
+  }
 }
 
-// Format tanggal standar Indonesia (contoh: 26/09/2026)
 function formatTanggal(tanggalString) {
   if (!tanggalString) return '-';
   const parts = tanggalString.split('-');
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
-// Render data ke tabel
 function renderTabelPenjualan() {
   const tbody = document.getElementById('tabelRiwayatPenjualan');
   tbody.innerHTML = '';
@@ -91,7 +102,7 @@ function renderTabelPenjualan() {
   filteredData.forEach(item => {
     const isLunas = item.status === 'Lunas';
     const badgeClass = isLunas ? 'bg-success' : 'bg-warning text-dark';
-    
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><strong>${formatTanggal(item.tanggal)}</strong></td>
@@ -109,7 +120,6 @@ function renderTabelPenjualan() {
   });
 }
 
-// Fungsi mengubah status piutang menjadi Lunas
 function ubahStatusLunas(id) {
   const index = daftarPenjualan.findIndex(item => item.id === id);
   if (index !== -1) {
@@ -119,22 +129,19 @@ function ubahStatusLunas(id) {
   }
 }
 
-// Fungsi menghapus data
 function hapusPenjualan(id) {
-  if (confirm('Yakin ingin menghapus data ini?')) {
+  if (confirm('Yakin ingin menghapus data dari tampilan ini?')) {
     daftarPenjualan = daftarPenjualan.filter(item => item.id !== id);
     renderTabelPenjualan();
     updateDashboard();
   }
 }
 
-// Filter riwayat penjualan
 function filterPenjualan(status) {
   filterStatus = status;
   renderTabelPenjualan();
 }
 
-// Update angka ringkasan dashboard
 function updateDashboard() {
   const totalPenjualan = daftarPenjualan
     .filter(i => i.status === 'Lunas')
