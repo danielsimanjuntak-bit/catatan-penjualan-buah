@@ -1,5 +1,5 @@
 // Gantilah baris pertama ini dengan URL yang disalin
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCu0qbSOr3_nKKubiMXf6lNsnZ-jqKei18cxgewpjIqToPoFIN1WqBuF4XJFcIA5Dt/exec';
+const SCRIPT_URL = 'const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7r8rX8_Dax-NOZSTY2oFsgtV5vX75dQ_TslFtr5IbMjzRA6CIw63faa4PQ-XRhnbv/exec'
 
 let daftarPenjualan = [];
 let filterStatus = 'semua';
