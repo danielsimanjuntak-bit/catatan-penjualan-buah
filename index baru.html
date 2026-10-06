@@ -2,145 +2,1015 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Pencatatan Toko Buah</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>Catatan Buah</title>
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  >
+
   <style>
+    :root {
+      --green: #198754;
+      --green-dark: #116c43;
+      --green-light: #eaf8f0;
+      --orange: #ff9f43;
+      --blue: #4d96ff;
+      --bg: #f5f8f6;
+      --text: #26332c;
+      --muted: #7b8780;
+      --white: #ffffff;
+      --border: #e8eee9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      padding-bottom: 90px;
     }
-    .card-dashboard {
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .app-header {
+      background: linear-gradient(135deg, #198754, #28a866);
+      color: white;
+      padding: 24px 18px 70px;
+      border-radius: 0 0 32px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-header::after {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      right: -60px;
+      top: -50px;
+    }
+
+    .app-header::before {
+      content: "";
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      left: -40px;
+      bottom: 10px;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: rgba(255,255,255,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      backdrop-filter: blur(8px);
+    }
+
+    .app-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .app-subtitle {
+      margin: 4px 0 0;
+      font-size: 13px;
+      opacity: .82;
+    }
+
+    /* =========================
+       CONTAINER
+    ========================= */
+
+    .main-container {
+      max-width: 1100px;
+      margin: -45px auto 0;
+      padding: 0 15px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* =========================
+       DASHBOARD
+    ========================= */
+
+    .dashboard-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 2px 2px 10px;
+      scrollbar-width: none;
+    }
+
+    .dashboard-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .stat-card {
+      min-width: 210px;
+      background: white;
+      border-radius: 20px;
+      padding: 17px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.07);
+      border: 1px solid rgba(255,255,255,.8);
+      flex-shrink: 0;
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 13px;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+    }
+
+    .icon-green {
+      background: #e7f7ef;
+      color: #198754;
+    }
+
+    .icon-blue {
+      background: #eaf2ff;
+      color: #4d96ff;
+    }
+
+    .icon-orange {
+      background: #fff3e6;
+      color: #ff9f43;
+    }
+
+    .icon-dark {
+      background: #edf0ee;
+      color: #34433a;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 3px 0 0;
+      color: #25332b;
+    }
+
+    /* =========================
+       TAB
+    ========================= */
+
+    .tab-wrapper {
+      background: white;
+      padding: 5px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.05);
+      display: flex;
+      margin: 20px 0;
+    }
+
+    .tab-btn {
+      flex: 1;
       border: none;
+      background: transparent;
+      padding: 12px 10px;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      font-size: 13px;
+      font-weight: 700;
+      color: #7a857e;
+      transition: .2s;
     }
-    .card-border-left-green { border-left: 5px solid #198754; }
-    .card-border-left-blue { border-left: 5px solid #0d6efd; }
-    .card-border-left-orange { border-left: 5px solid #fd7e14; }
-    .card-border-left-dark { border-left: 5px solid #212529; }
+
+    .tab-btn.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 5px 12px rgba(25,135,84,.2);
+    }
+
+    /* =========================
+       CARD
+    ========================= */
+
+    .main-card {
+      background: white;
+      border: none;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 6px 25px rgba(0,0,0,.05);
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #59665e;
+      margin-bottom: 6px;
+    }
+
+    .form-control,
+    .form-select {
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      min-height: 46px;
+      padding: 10px 13px;
+      font-size: 14px;
+      background-color: #fbfcfb;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #52b788;
+      box-shadow: 0 0 0 3px rgba(25,135,84,.10);
+      background: white;
+    }
+
+    .total-box {
+      background: #edf9f2 !important;
+      border: 1px solid #d9f0e2 !important;
+      color: var(--green-dark);
+      font-weight: 800;
+    }
+
+    .save-button {
+      min-height: 52px;
+      border-radius: 15px;
+      font-weight: 800;
+      border: none;
+      background: linear-gradient(135deg, #198754, #26a866);
+      box-shadow: 0 7px 16px rgba(25,135,84,.22);
+      transition: .2s;
+    }
+
+    .save-button:active {
+      transform: scale(.98);
+    }
+
+    /* =========================
+       FILTER
+    ========================= */
+
+    .filter-scroll {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 3px;
+    }
+
+    .filter-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      white-space: nowrap;
+      border-radius: 10px !important;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 11px;
+    }
+
+    /* =========================
+       TRANSACTION CARD
+    ========================= */
+
+    .transaction-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .transaction-card {
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 15px;
+      background: #fff;
+      transition: .2s;
+    }
+
+    .transaction-card:hover {
+      border-color: #b9dfc9;
+    }
+
+    .transaction-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .customer-name {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .transaction-date {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .fruit-name {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    .transaction-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e5ebe7;
+    }
+
+    .qty-info {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .transaction-total {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--green-dark);
+    }
+
+    .status-badge {
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .status-paid {
+      background: #e8f7ef;
+      color: #198754;
+    }
+
+    .status-unpaid {
+      background: #fff1df;
+      color: #d97706;
+    }
+
+    /* =========================
+       EMPTY STATE
+    ========================= */
+
+    .empty-state {
+      text-align: center;
+      padding: 35px 15px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      width: 65px;
+      height: 65px;
+      border-radius: 20px;
+      background: var(--green-light);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 28px;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 576px) {
+
+      body {
+        padding-bottom: 80px;
+      }
+
+      .app-header {
+        padding-top: 20px;
+        padding-bottom: 65px;
+      }
+
+      .main-container {
+        padding: 0 12px;
+      }
+
+      .main-card {
+        padding: 17px;
+        border-radius: 19px;
+      }
+
+      .stat-card {
+        min-width: 190px;
+      }
+
+      .section-title {
+        font-size: 16px;
+      }
+    }
+
+    /* =========================
+       DESKTOP
+    ========================= */
+
+    @media (min-width: 768px) {
+
+      .dashboard-scroll {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        overflow: visible;
+      }
+
+      .stat-card {
+        min-width: 0;
+      }
+
+      .transaction-list {
+        display: none;
+      }
+
+      .desktop-table {
+        display: block !important;
+      }
+    }
+
+    @media (max-width: 767px) {
+
+      .desktop-table {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
-<body class="py-4">
 
-  <div class="container">
-    <!-- Header -->
-    <div class="text-center mb-4">
-      <h2 class="fw-bold text-success">Sistem Pencatatan Toko Buah</h2>
-      <p class="text-muted">Kelola Penjualan, Pembelian Kulakan, dan Tagihan Piutang</p>
+<body>
+
+  <!-- =========================
+       HEADER
+  ========================== -->
+
+  <header class="app-header">
+
+    <div class="container header-content">
+
+      <div class="d-flex align-items-center gap-3">
+
+        <div class="brand-icon">
+          🍊
+        </div>
+
+        <div>
+          <h1 class="app-title">Catatan Buah</h1>
+          <p class="app-subtitle">
+            Kelola penjualan & Pembelian Stok 
+          </p>
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- Ringkasan Dashboard -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-3">
-        <div class="card card-dashboard card-border-left-green p-3">
-          <small class="text-muted fw-bold">Total Penjualan</small>
-          <h4 class="mb-0 fw-bold mt-1" id="totalPenjualanText">Rp 0</h4>
+  </header>
+
+
+  <main class="main-container">
+
+    <!-- =========================
+         DASHBOARD
+    ========================== -->
+
+    <div class="dashboard-scroll">
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <p class="stat-label">Total Penjualan</p>
+            <h3 class="stat-value" id="totalPenjualanText">Rp 0</h3>
+          </div>
+
+          <div class="stat-icon icon-green">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
         </div>
+
+        <small class="text-success fw-semibold">
+          Penjualan tercatat
+        </small>
       </div>
-      <div class="col-md-3">
-        <div class="card card-dashboard card-border-left-blue p-3">
-          <small class="text-muted fw-bold">Total Pembelian (Kulakan)</small>
-          <h4 class="mb-0 fw-bold mt-1" id="totalPembelianText">Rp 0</h4>
+
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <p class="stat-label">Total Pembelian Stok</p>
+            <h3 class="stat-value" id="totalPembelianText">Rp 0</h3>
+          </div>
+
+          <div class="stat-icon icon-blue">
+            <i class="bi bi-box-seam"></i>
+          </div>
         </div>
+
+        <small class="text-primary fw-semibold">
+          Modal pembelian
+        </small>
       </div>
-      <div class="col-md-3">
-        <div class="card card-dashboard card-border-left-orange p-3">
-          <small class="text-muted fw-bold">Total Piutang Belum Bayar</small>
-          <h4 class="mb-0 fw-bold mt-1" id="totalPiutangText">Rp 0</h4>
+
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <p class="stat-label">Piutang</p>
+            <h3 class="stat-value" id="totalPiutangText">Rp 0</h3>
+          </div>
+
+          <div class="stat-icon icon-orange">
+            <i class="bi bi-wallet2"></i>
+          </div>
         </div>
+
+        <small class="text-warning fw-semibold">
+          Belum dibayar
+        </small>
       </div>
-      <div class="col-md-3">
-        <div class="card card-dashboard card-border-left-dark p-3">
-          <small class="text-muted fw-bold">Estimasi Keuntungan Kotor</small>
-          <h4 class="mb-0 fw-bold mt-1" id="estimasiKeuntunganText">Rp 0</h4>
+
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <div>
+            <p class="stat-label">Keuntungan Kotor</p>
+            <h3 class="stat-value" id="estimasiKeuntunganText">Rp 0</h3>
+          </div>
+
+          <div class="stat-icon icon-dark">
+            <i class="bi bi-cash-stack"></i>
+          </div>
         </div>
+
+        <small class="text-dark fw-semibold">
+          Estimasi keuntungan
+        </small>
       </div>
+
     </div>
 
-    <!-- Navigasi Tab (Penjualan / Pembelian) -->
-    <div class="d-flex justify-content-center mb-4">
-      <div class="btn-group" role="group">
-        <button type="button" class="btn btn-success active" id="btnTabPenjualan">Penjualan (Kas Masuk)</button>
-        <button type="button" class="btn btn-outline-secondary" id="btnTabPembelian">Pembelian (Kas Keluar)</button>
-      </div>
+
+    <!-- =========================
+         TAB
+    ========================== -->
+
+    <div class="tab-wrapper">
+
+      <button
+        type="button"
+        class="tab-btn active"
+        id="btnTabPenjualan"
+      >
+        <i class="bi bi-cart-check me-1"></i>
+        Penjualan
+      </button>
+
+      <button
+        type="button"
+        class="tab-btn"
+        id="btnTabPembelian"
+      >
+        <i class="bi bi-bag-check me-1"></i>
+        Pembelian Stok
+      </button>
+
     </div>
 
-    <!-- Form & Tabel Penjualan -->
-    <div id="sectionPenjualan">
-      <div class="card card-dashboard p-4 mb-4">
-        <h5 class="fw-bold mb-3">Catat Penjualan Baru</h5>
+
+    <!-- =========================
+         PENJUALAN
+    ========================== -->
+
+    <section id="sectionPenjualan">
+
+      <!-- FORM -->
+
+      <div class="main-card">
+
+        <div class="mb-4">
+
+          <h2 class="section-title">
+            <i class="bi bi-plus-circle-fill text-success me-1"></i>
+            Catat Penjualan
+          </h2>
+
+          <p class="section-subtitle">
+            Masukkan transaksi penjualan baru
+          </p>
+
+        </div>
+
+
         <form id="formPenjualan" class="row g-3">
-          <!-- Fitur Baru: Tanggal Penjualan -->
-          <div class="col-md-3">
-            <label for="tanggalPenjualan" class="form-label">Tanggal*</label>
-            <input type="date" class="form-control" id="tanggalPenjualan" required>
+
+          <!-- Tanggal -->
+
+          <div class="col-12 col-md-3">
+
+            <label
+              for="tanggalPenjualan"
+              class="form-label"
+            >
+              Tanggal *
+            </label>
+
+            <input
+              type="date"
+              class="form-control"
+              id="tanggalPenjualan"
+              required
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="namaPelanggan" class="form-label">Nama Pemesan / Pelanggan*</label>
-            <input type="text" class="form-control" id="namaPelanggan" placeholder="Contoh: Bu Rina" required>
+
+
+          <!-- Pelanggan -->
+
+          <div class="col-12 col-md-3">
+
+            <label
+              for="namaPelanggan"
+              class="form-label"
+            >
+              Nama Pelanggan *
+            </label>
+
+            <input
+              type="text"
+              class="form-control"
+              id="namaPelanggan"
+              placeholder="Contoh: Bu Rina"
+              required
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="noWa" class="form-label">No. WhatsApp (Opsional)</label>
-            <input type="tel" class="form-control" id="noWa" placeholder="081234567890">
+
+
+          <!-- WhatsApp -->
+
+          <div class="col-12 col-md-3">
+
+            <label
+              for="noWa"
+              class="form-label"
+            >
+              WhatsApp
+            </label>
+
+            <input
+              type="tel"
+              class="form-control"
+              id="noWa"
+              placeholder="081234567890"
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="pilihBuah" class="form-label">Pilih Buah*</label>
-            <select class="form-select" id="pilihBuah" required>
-              <option value="">-- Pilih Buah --</option>
-              <option value="Jeruk Squeeze">Jeruk Squeeze</option>
-              <option value="Jeruk Peras">Jeruk Peras</option>
-              <option value="Jeruk Manis">Jeruk Manis</option>
+
+
+          <!-- Buah -->
+
+          <div class="col-12 col-md-3">
+
+            <label
+              for="pilihBuah"
+              class="form-label"
+            >
+              Jenis Buah *
+            </label>
+
+            <select
+              class="form-select"
+              id="pilihBuah"
+              required
+            >
+
+              <option value="">
+                Pilih buah
+              </option>
+
+              <option value="Jeruk Squeeze">
+                🍊 Jeruk Squeeze
+              </option>
+
+              <option value="Jeruk Peras">
+                🍊 Jeruk Peras
+              </option>
+
+              <option value="Jeruk Manis">
+                🍊 Jeruk Manis
+              </option>
+
             </select>
+
           </div>
-          <div class="col-md-3">
-            <label for="qty" class="form-label">Jumlah / Qty*</label>
-            <input type="number" class="form-control" id="qty" min="1" step="any" required>
+
+
+          <!-- Qty -->
+
+          <div class="col-6 col-md-3">
+
+            <label
+              for="qty"
+              class="form-label"
+            >
+              Jumlah / Qty *
+            </label>
+
+            <input
+              type="number"
+              class="form-control"
+              id="qty"
+              min="1"
+              step="any"
+              placeholder="0"
+              required
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="satuan" class="form-label">Satuan</label>
-            <select class="form-select" id="satuan">
+
+
+          <!-- Satuan -->
+
+          <div class="col-6 col-md-3">
+
+            <label
+              for="satuan"
+              class="form-label"
+            >
+              Satuan
+            </label>
+
+            <select
+              class="form-select"
+              id="satuan"
+            >
+
               <option value="Kg">Kg</option>
               <option value="Ikat">Ikat</option>
               <option value="Peti">Peti</option>
+
             </select>
+
           </div>
-          <div class="col-md-3">
-            <label for="hargaSatuan" class="form-label">Harga Satuan (Rp)*</label>
-            <input type="number" class="form-control" id="hargaSatuan" min="0" required>
+
+
+          <!-- Harga -->
+
+          <div class="col-6 col-md-3">
+
+            <label
+              for="hargaSatuan"
+              class="form-label"
+            >
+              Harga Satuan *
+            </label>
+
+            <input
+              type="number"
+              class="form-control"
+              id="hargaSatuan"
+              min="0"
+              placeholder="Rp 0"
+              required
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="totalHarga" class="form-label">Total Harga (Rp)</label>
-            <input type="text" class="form-control bg-light" id="totalHarga" readonly value="Rp 0">
+
+
+          <!-- Total -->
+
+          <div class="col-6 col-md-3">
+
+            <label
+              for="totalHarga"
+              class="form-label"
+            >
+              Total Harga
+            </label>
+
+            <input
+              type="text"
+              class="form-control total-box"
+              id="totalHarga"
+              readonly
+              value="Rp 0"
+            >
+
           </div>
-          <div class="col-md-3">
-            <label for="statusPembayaran" class="form-label">Status Pembayaran*</label>
-            <select class="form-select" id="statusPembayaran" required>
-              <option value="Lunas">Lunas</option>
-              <option value="Belum Bayar">Belum Bayar (Piutang)</option>
+
+
+          <!-- Status -->
+
+          <div class="col-12">
+
+            <label
+              for="statusPembayaran"
+              class="form-label"
+            >
+              Status Pembayaran *
+            </label>
+
+            <select
+              class="form-select"
+              id="statusPembayaran"
+              required
+            >
+
+              <option value="Lunas">
+                ✓ Lunas
+              </option>
+
+              <option value="Belum Bayar">
+                ⏳ Belum Bayar / Piutang
+              </option>
+
             </select>
+
           </div>
-          <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-success w-100 py-2 fw-bold">Simpan Penjualan</button>
+
+
+          <!-- Submit -->
+
+          <div class="col-12 pt-2">
+
+            <button
+              type="submit"
+              class="btn btn-success save-button w-100"
+            >
+
+              <i class="bi bi-check2-circle me-2"></i>
+
+              Simpan Penjualan
+
+            </button>
+
           </div>
+
         </form>
+
       </div>
 
-      <!-- Riwayat Penjualan -->
-      <div class="card card-dashboard p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="fw-bold mb-0">Riwayat Penjualan</h5>
-          <div class="btn-group btn-group-sm" role="group">
-            <button type="button" class="btn btn-dark active" onclick="filterPenjualan('semua')">Semua</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="filterPenjualan('Lunas')">Lunas</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="filterPenjualan('Belum Bayar')">Belum Bayar (Piutang)</button>
+
+      <!-- =========================
+           RIWAYAT
+      ========================== -->
+
+      <div class="main-card">
+
+        <div class="d-flex justify-content-between align-items-start mb-3">
+
+          <div>
+
+            <h2 class="section-title">
+              Riwayat Penjualan
+            </h2>
+
+            <p class="section-subtitle">
+              Daftar transaksi terbaru
+            </p>
+
           </div>
+
+          <div class="stat-icon icon-green">
+            <i class="bi bi-clock-history"></i>
+          </div>
+
         </div>
-        <div class="table-responsive">
+
+
+        <!-- FILTER -->
+
+        <div class="filter-scroll mb-3">
+
+          <button
+            type="button"
+            class="btn btn-dark filter-btn"
+            onclick="filterPenjualan('semua')"
+          >
+            Semua
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-success filter-btn"
+            onclick="filterPenjualan('Lunas')"
+          >
+            Lunas
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline-warning filter-btn"
+            onclick="filterPenjualan('Belum Bayar')"
+          >
+            Piutang
+          </button>
+
+        </div>
+
+
+        <!-- =========================
+             MOBILE LIST
+        ========================== -->
+
+        <div
+          id="tabelRiwayatPenjualanMobile"
+          class="transaction-list"
+        >
+
+          <div class="empty-state">
+
+            <div class="empty-icon">
+              <i class="bi bi-receipt"></i>
+            </div>
+
+            <div class="fw-bold">
+              Belum ada transaksi
+            </div>
+
+            <small>
+              Penjualan yang Anda simpan akan muncul di sini.
+            </small>
+
+          </div>
+
+        </div>
+
+
+        <!-- =========================
+             DESKTOP TABLE
+        ========================== -->
+
+        <div class="table-responsive desktop-table">
+
           <table class="table table-hover align-middle">
+
             <thead class="table-light">
+
               <tr>
+
                 <th>Tanggal</th>
                 <th>Pelanggan</th>
                 <th>Buah</th>
@@ -148,17 +1018,167 @@
                 <th>Total</th>
                 <th>Status</th>
                 <th>Aksi</th>
+
               </tr>
+
             </thead>
+
             <tbody id="tabelRiwayatPenjualan">
-              <!-- Data dimasukkan via Javascript -->
+
+              <!-- Data dari Javascript -->
+
             </tbody>
+
           </table>
+
         </div>
+
       </div>
-    </div>
-  </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
 
   <script src="script.js"></script>
+
+
+  <!-- =========================
+       UI HELPER
+  ========================== -->
+
+  <script>
+
+    /*
+      Mengatur tanggal default ke hari ini
+    */
+
+    const tanggalInput =
+      document.getElementById("tanggalPenjualan");
+
+    if (tanggalInput && !tanggalInput.value) {
+
+      const today = new Date();
+
+      const yyyy = today.getFullYear();
+
+      const mm = String(
+        today.getMonth() + 1
+      ).padStart(2, "0");
+
+      const dd = String(
+        today.getDate()
+      ).padStart(2, "0");
+
+      tanggalInput.value =
+        `${yyyy}-${mm}-${dd}`;
+
+    }
+
+
+    /*
+      Hitung total otomatis
+    */
+
+    const qtyInput =
+      document.getElementById("qty");
+
+    const hargaInput =
+      document.getElementById("hargaSatuan");
+
+    const totalInput =
+      document.getElementById("totalHarga");
+
+
+    function hitungTotal() {
+
+      const qty =
+        parseFloat(qtyInput.value) || 0;
+
+      const harga =
+        parseFloat(hargaInput.value) || 0;
+
+      const total =
+        qty * harga;
+
+      totalInput.value =
+        "Rp " +
+        total.toLocaleString("id-ID");
+
+    }
+
+
+    if (qtyInput) {
+
+      qtyInput.addEventListener(
+        "input",
+        hitungTotal
+      );
+
+    }
+
+
+    if (hargaInput) {
+
+      hargaInput.addEventListener(
+        "input",
+        hitungTotal
+      );
+
+    }
+
+
+    /*
+      Tab Penjualan
+    */
+
+    const btnPenjualan =
+      document.getElementById(
+        "btnTabPenjualan"
+      );
+
+    const btnPembelian =
+      document.getElementById(
+        "btnTabPembelian"
+      );
+
+
+    if (btnPenjualan) {
+
+      btnPenjualan.addEventListener(
+        "click",
+        function () {
+
+          btnPenjualan.classList.add("active");
+
+          btnPembelian.classList.remove("active");
+
+        }
+      );
+
+    }
+
+
+    if (btnPembelian) {
+
+      btnPembelian.addEventListener(
+        "click",
+        function () {
+
+          btnPembelian.classList.add("active");
+
+          btnPenjualan.classList.remove("active");
+
+        }
+      );
+
+    }
+
+  </script>
+
 </body>
 </html>
