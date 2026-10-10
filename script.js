@@ -653,7 +653,7 @@ function renderPenjualan(data = semuaDataPenjualan) {
 
 
 /* =========================================================
-   25. RENDER PEMBELIAN
+   25. RENDER PEMBELIAN (DENGAN TOMBOL UBAH STATUS)
    ========================================================= */
 
 function renderPembelian(data = semuaDataPembelian) {
@@ -681,6 +681,15 @@ function renderPembelian(data = semuaDataPembelian) {
     const total = Number(item.total) || 0;
     const status = item.status || "";
 
+    const tombolAksi = `
+      <button type="button" class="btn btn-sm btn-outline-success me-1" title="Ubah Status" onclick="ubahStatusPembelian('${escapeHTML(id)}', '${escapeHTML(status)}')">
+        <i class="bi bi-arrow-repeat"></i> Ubah Status
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="hapusPembelian('${escapeHTML(id)}')">
+        <i class="bi bi-trash"></i>
+      </button>
+    `;
+
     /* DESKTOP */
     tbody.innerHTML += `
       <tr>
@@ -690,11 +699,7 @@ function renderPembelian(data = semuaDataPembelian) {
         <td>${escapeHTML(qty)} ${escapeHTML(satuan)}</td>
         <td><strong>${formatRupiah(total)}</strong></td>
         <td>${badgeStatusPembelian(status)}</td>
-        <td>
-          <button type="button" class="btn btn-sm btn-outline-danger" onclick="hapusPembelian('${escapeHTML(id)}')">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
+        <td>${tombolAksi}</td>
       </tr>
     `;
 
@@ -722,14 +727,12 @@ function renderPembelian(data = semuaDataPembelian) {
             <div class="label">Total</div>
             <div class="value">${formatRupiah(total)}</div>
           </div>
-          <div class="col-8">
+          <div class="col-6">
             <div class="label">Status</div>
             <div class="value">${badgeStatusPembelian(status)}</div>
           </div>
-          <div class="col-4 text-end">
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="hapusPembelian('${escapeHTML(id)}')">
-              <i class="bi bi-trash"></i>
-            </button>
+          <div class="col-6 text-end d-flex justify-content-end align-items-center">
+            ${tombolAksi}
           </div>
         </div>
       </div>
@@ -768,12 +771,11 @@ function renderPreOrder(data = semuaDataPreOrder) {
     const total = Number(item.total) || 0;
     const status = item.status || "";
 
-    // Cek apakah PO sudah diproses ke penjualan
-    const isSudahDiambil = status.toLowerCase() === "sudah diambil";
+    const isSudahDiambil = String(status).toLowerCase() === "sudah diambil";
 
     const tombolAksi = isSudahDiambil ? `
-      <span class="badge bg-secondary text-white p-2">Sudah Diproses</span>
-      <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Hapus" onclick="hapusPreOrder('${escapeHTML(id)}')">
+      <span class="badge bg-secondary text-white p-2 me-1">Sudah Diproses</span>
+      <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" onclick="hapusPreOrder('${escapeHTML(id)}')">
         <i class="bi bi-trash"></i>
       </button>
     ` : `
@@ -842,7 +844,7 @@ function renderPreOrder(data = semuaDataPreOrder) {
 
 
 /* =========================================================
-   27. KONVERSI PRE ORDER KE PENJUALAN (FITUR BARU)
+   27. KONVERSI PRE ORDER KE PENJUALAN
    ========================================================= */
 
 async function prosesKonversiPreOrder(id) {
@@ -875,7 +877,42 @@ async function prosesKonversiPreOrder(id) {
 
 
 /* =========================================================
-   28. FILTER PENJUALAN
+   28. UBAH STATUS PEMBELIAN (FITUR BARU)
+   ========================================================= */
+
+async function ubahStatusPembelian(id, statusSaatIni) {
+  if (!id) {
+    alert("ID Pembelian tidak ditemukan.");
+    return;
+  }
+
+  const statusBaru = statusSaatIni === "Sudah Dibayar" ? "Belum Dibayar" : "Sudah Dibayar";
+
+  const konfirmasi = confirm(`Ubah status pembayaran belanja stok ini menjadi "${statusBaru}"?`);
+  if (!konfirmasi) return;
+
+  try {
+    const response = await kirimData({
+      action: "ubahStatusPembelian",
+      id: id,
+      status: statusBaru
+    });
+
+    if (response.success) {
+      alert("✅ Status pembayaran belanja stok berhasil diubah!");
+      await ambilSemuaData();
+    } else {
+      alert("❌ Gagal mengubah status:\n" + response.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert("❌ Terjadi kesalahan:\n" + error.message);
+  }
+}
+
+
+/* =========================================================
+   29. FILTER PENJUALAN
    ========================================================= */
 
 function filterPenjualan(status) {
@@ -890,7 +927,7 @@ function filterPenjualan(status) {
 
 
 /* =========================================================
-   29. HAPUS PENJUALAN
+   30. HAPUS PENJUALAN
    ========================================================= */
 
 async function hapusPenjualan(id) {
@@ -917,7 +954,7 @@ async function hapusPenjualan(id) {
 
 
 /* =========================================================
-   30. HAPUS PEMBELIAN
+   31. HAPUS PEMBELIAN
    ========================================================= */
 
 async function hapusPembelian(id) {
@@ -944,7 +981,7 @@ async function hapusPembelian(id) {
 
 
 /* =========================================================
-   31. HAPUS PRE ORDER
+   32. HAPUS PRE ORDER
    ========================================================= */
 
 async function hapusPreOrder(id) {
@@ -971,7 +1008,7 @@ async function hapusPreOrder(id) {
 
 
 /* =========================================================
-   32. DASHBOARD
+   33. DASHBOARD
    ========================================================= */
 
 function hitungDashboard() {
@@ -982,6 +1019,7 @@ function hitungDashboard() {
   semuaDataPenjualan.forEach(item => {
     const total = Number(item.total) || 0;
     totalPenjualan += total;
+
     if (item.status === "Belum Bayar") {
       totalPiutang += total;
     }
@@ -1008,7 +1046,7 @@ function hitungDashboard() {
 
 
 /* =========================================================
-   33. PASANG EVENT LISTENER
+   34. PASANG EVENT LISTENER
    ========================================================= */
 
 function pasangEventListener() {
@@ -1021,7 +1059,7 @@ function pasangEventListener() {
   const formPreOrder = document.getElementById("formPreOrder");
   if (formPreOrder) formPreOrder.addEventListener("submit", simpanPreOrder);
 
-  // Auto Calc Forms
+  /* Auto Calculate Inputs */
   const qty = document.getElementById("qty");
   const hargaSatuan = document.getElementById("hargaSatuan");
   if (qty) qty.addEventListener("input", hitungTotalPenjualanForm);
@@ -1040,7 +1078,7 @@ function pasangEventListener() {
 
 
 /* =========================================================
-   34. SAAT WEBSITE SELESAI DIMUAT
+   35. SAAT WEBSITE SELESAI DIMUAT
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async function() {
